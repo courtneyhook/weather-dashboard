@@ -5,6 +5,7 @@ var currentCityEl = document.getElementById("current-city");
 var tempEl = document.getElementById("temp");
 var windEl = document.getElementById("wind");
 var humidEl = document.getElementById("humid");
+var descriptionEL = document.getElementById("description");
 var searchedCityEl = document.getElementById("city-search");
 var submitSearchEl = document.getElementById("submit-button");
 var currentCity = searchedCityEl.value;
@@ -14,18 +15,21 @@ var date = dayjs();
 var currentDate = date.format("MM/DD/YYYY");
 var currentTime = date.format("h:m:s A");
 
-var lon, lat, state, temp, wind, humidity;
+var lon, lat, state, temp, wind, humidity, description;
 var apiKey = "9f93286bb3109d48c225c107a2745543";
 
+var parsedCities = localStorage.getItem("cities");
+previousCitySearches = JSON.parse(parsedCities);
+for (i = 0; i < previousCitySearches.length; i++) {
+  var cityName = document.createElement("button");
+  cityName.classList.add("previous-btn");
+  cityName.textContent = previousCitySearches[i];
+  previousSearchEL.append(cityName);
+}
 //api
 
-//logic
-//when the user types a city and clicks submit, an event is triggered.
 //what will happen if there are two or more places with the same name in different states
 //what will happen if the city name is misspelled
-//the city name is saved into local storage
-//the city name and weather info is displayed
-//the five day forcast is displayed
 
 function getLocation(event) {
   event.preventDefault();
@@ -44,12 +48,21 @@ function getLocation(event) {
       lon = data[0].lon;
       state = data[0].state;
       getWeather(lat, lon, state);
+
       updateCurrentCity();
     });
 }
 
 function updateCurrentCity() {
   currentCityEl.textContent = `${currentCity} (${currentDate})`;
+  previousCitySearches.unshift(currentCity);
+  var stringifiedCity = JSON.stringify(previousCitySearches);
+  localStorage.setItem("cities", stringifiedCity);
+
+  var cityName = document.createElement("button");
+  cityName.classList.add("previous-btn");
+  cityName.textContent = previousCitySearches[0];
+  previousSearchEL.prepend(cityName);
 }
 
 function getWeather(lat, lon, state) {
@@ -66,8 +79,10 @@ function getWeather(lat, lon, state) {
     })
     .then(function (data) {
       temp = Math.round(data.main.temp);
-      wind = data.wind.speed;
+      wind = Math.round(data.wind.speed);
       humidity = data.main.humidity;
+      description = data.weather[0].description;
+
       getFuture(lat, lon);
       updateCurrentWeather(temp, wind, humidity);
     });
@@ -77,6 +92,7 @@ function updateCurrentWeather(temp, wind, humidity) {
   tempEl.textContent = `Temp: ${temp}°F`;
   windEl.textContent = `Wind: ${wind} MPH`;
   humidEl.textContent = `Humidity: ${humidity}%`;
+  descriptionEL.textContent = `Description: ${description}`;
 }
 
 function getFuture(lat, lon) {
@@ -94,15 +110,23 @@ function getFuture(lat, lon) {
     })
     .then(function (data) {
       console.log(data);
+      var today = dayjs();
       for (var i = 0; i < 5; i++) {
         var x = i + 1;
-        document.getElementById(`day-${x}-date`).textContent = currentDate;
-        document.getElementById(`day-${x}-temp`).textContent =
-          data.list[i].main.temp;
-        document.getElementById(`day-${x}-wind`).textContent =
-          data.list[i].wind.speed;
-        document.getElementById(`day-${x}-humidity`).textContent =
-          data.list[i].main.humidity;
+        var tomorrow = today.add(x, "day");
+        tomorrow = tomorrow.format("M/D/YYYY");
+        document.getElementById(`day-${x}-date`).textContent = tomorrow;
+        document.getElementById(
+          `day-${x}-temp`
+        ).textContent = `Temp: ${Math.round(data.list[i].main.temp)}°F`;
+        document.getElementById(
+          `day-${x}-wind`
+        ).textContent = `Wind: ${Math.round(data.list[i].wind.speed)}MPH`;
+        document.getElementById(
+          `day-${x}-humidity`
+        ).textContent = `Humidity: ${data.list[i].main.humidity}%`;
+        document.getElementById(`day-${x}-description`).textContent =
+          data.list[i].weather[0].description;
       }
     });
 }
