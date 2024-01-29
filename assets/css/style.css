@@ -15,6 +15,12 @@ h1 {
   padding: 0px;
 }
 
+.future {
+  display: inline;
+  height: 100px;
+  width: 50px;
+}
+
 #head {
   grid-column-start: 1;
   grid-column-end: 3;

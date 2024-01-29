@@ -95,10 +95,14 @@ function getFuture(lat, lon) {
     .then(function (data) {
       console.log(data);
       for (var i = 0; i < 5; i++) {
-        var day = document.createElement("div");
-        day.textContent = data.list[i].main.temp;
-        fiveDayEl.append(day);
-        console.log(data.list[i].main.temp);
+        var x = i + 1;
+        document.getElementById(`day-${x}-date`).textContent = currentDate;
+        document.getElementById(`day-${x}-temp`).textContent =
+          data.list[i].main.temp;
+        document.getElementById(`day-${x}-wind`).textContent =
+          data.list[i].wind.speed;
+        document.getElementById(`day-${x}-humidity`).textContent =
+          data.list[i].main.humidity;
       }
     });
 }
