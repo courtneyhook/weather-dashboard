@@ -8,6 +8,8 @@ var humidEl = document.getElementById("humid");
 var descriptionEL = document.getElementById("description");
 var searchedCityEl = document.getElementById("city-search");
 var submitSearchEl = document.getElementById("submit-button");
+var previousCityEL = document.querySelectorAll(".previous-btn");
+var currentIconEl = document.getElementById("icon");
 var currentCity = searchedCityEl.value;
 var previousCitySearches = [];
 
@@ -19,11 +21,11 @@ var lon, lat, state, temp, wind, humidity, description, icon, iconImg, iconVar;
 var apiKey = "9f93286bb3109d48c225c107a2745543";
 
 var parsedCities = localStorage.getItem("cities");
-console.log(parsedCities);
 if (parsedCities) {
   previousCitySearches = JSON.parse(parsedCities);
   for (i = 0; i < previousCitySearches.length; i++) {
     var cityName = document.createElement("button");
+    cityName.setAttribute("id", previousCitySearches[i]);
     cityName.classList.add("previous-btn");
     cityName.textContent = previousCitySearches[i];
     previousSearchEL.append(cityName);
@@ -51,7 +53,6 @@ function getLocation(event) {
       lon = data[0].lon;
       state = data[0].state;
       getWeather(lat, lon, state);
-
       updateCurrentCity();
     });
 }
@@ -68,20 +69,16 @@ function updateCurrentCity() {
   localStorage.setItem("cities", stringifiedCity);
   previousSearchEL.textContent = "";
   var parsedCities = localStorage.getItem("cities");
-  console.log(parsedCities);
   if (parsedCities) {
     previousCitySearches = JSON.parse(parsedCities);
     for (i = 0; i < previousCitySearches.length; i++) {
       var cityName = document.createElement("button");
+      cityName.setAttribute("id", previousCitySearches[i]);
       cityName.classList.add("previous-btn");
       cityName.textContent = previousCitySearches[i];
       previousSearchEL.append(cityName);
     }
   }
-  // var cityName = document.createElement("button");
-  // cityName.classList.add("previous-btn");
-  // cityName.textContent = previousCitySearches[0];
-  // previousSearchEL.prepend(cityName);
 }
 
 function getWeather(lat, lon, state) {
@@ -101,6 +98,7 @@ function getWeather(lat, lon, state) {
       temp = Math.round(data.main.temp);
       wind = Math.round(data.wind.speed);
       humidity = data.main.humidity;
+
       description = data.weather[0].description;
       getFuture(lat, lon);
       updateCurrentWeather(temp, wind, humidity);
@@ -111,8 +109,10 @@ function updateCurrentWeather(temp, wind, humidity) {
   tempEl.textContent = `Temp: ${temp}°F`;
   windEl.textContent = `Wind: ${wind} MPH`;
   humidEl.textContent = `Humidity: ${humidity}%`;
-  iconImg = document.createElement("img");
-  iconImg.src = "https://openweathermap.org/img/wn/" + icon + "@2x.png";
+  var pic = document.createElement("img");
+  pic.setAttribute("src", `https://openweathermap.org/img/wn/${icon}@2x.png`);
+  currentIconEl.append(pic);
+  descriptionEL.textContent = description;
 }
 
 function getFuture(lat, lon) {
@@ -129,12 +129,18 @@ function getFuture(lat, lon) {
       return response.json();
     })
     .then(function (data) {
-      console.log(data);
       var today = dayjs();
       for (var i = 0; i < 5; i++) {
         var x = i + 1;
+        var futureIcon = data.list[i].weather[0].icon;
+        var futureIconSrc = document.createElement("img");
+        futureIconSrc.setAttribute(
+          "src",
+          `https://openweathermap.org/img/wn/${futureIcon}@2x.png`
+        );
         var tomorrow = today.add(x, "day");
         tomorrow = tomorrow.format("M/D/YYYY");
+        document.getElementById(`day-${x}-icon`).append(futureIconSrc);
         document.getElementById(`day-${x}-date`).textContent = tomorrow;
         document.getElementById(
           `day-${x}-temp`
@@ -150,6 +156,15 @@ function getFuture(lat, lon) {
       }
     });
 }
-//local storage
-//event listener
+
+function searchCityAgain(event) {
+  event.stopPropagation();
+  var firedButton = previousSearchEL.children;
+  console.log(this.id);
+  for (var g = 0; g < firedButton.length; g++) {
+    console.log(firedButton[g].id);
+  }
+}
+
 submitSearchEl.addEventListener("click", getLocation);
+previousSearchEL.addEventListener("click", searchCityAgain);
