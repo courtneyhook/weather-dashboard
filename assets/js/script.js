@@ -15,16 +15,19 @@ var date = dayjs();
 var currentDate = date.format("MM/DD/YYYY");
 var currentTime = date.format("h:m:s A");
 
-var lon, lat, state, temp, wind, humidity, description;
+var lon, lat, state, temp, wind, humidity, description, icon, iconImg, iconVar;
 var apiKey = "9f93286bb3109d48c225c107a2745543";
 
 var parsedCities = localStorage.getItem("cities");
-previousCitySearches = JSON.parse(parsedCities);
-for (i = 0; i < previousCitySearches.length; i++) {
-  var cityName = document.createElement("button");
-  cityName.classList.add("previous-btn");
-  cityName.textContent = previousCitySearches[i];
-  previousSearchEL.append(cityName);
+console.log(parsedCities);
+if (parsedCities) {
+  previousCitySearches = JSON.parse(parsedCities);
+  for (i = 0; i < previousCitySearches.length; i++) {
+    var cityName = document.createElement("button");
+    cityName.classList.add("previous-btn");
+    cityName.textContent = previousCitySearches[i];
+    previousSearchEL.append(cityName);
+  }
 }
 //api
 
@@ -55,14 +58,30 @@ function getLocation(event) {
 
 function updateCurrentCity() {
   currentCityEl.textContent = `${currentCity} (${currentDate})`;
+  searchedCityEl.value = "";
+  if (previousCitySearches.includes(currentCity)) {
+    var indexCity = previousCitySearches.indexOf(currentCity);
+    previousCitySearches.splice(indexCity, 1);
+  }
   previousCitySearches.unshift(currentCity);
   var stringifiedCity = JSON.stringify(previousCitySearches);
   localStorage.setItem("cities", stringifiedCity);
-
-  var cityName = document.createElement("button");
-  cityName.classList.add("previous-btn");
-  cityName.textContent = previousCitySearches[0];
-  previousSearchEL.prepend(cityName);
+  previousSearchEL.textContent = "";
+  var parsedCities = localStorage.getItem("cities");
+  console.log(parsedCities);
+  if (parsedCities) {
+    previousCitySearches = JSON.parse(parsedCities);
+    for (i = 0; i < previousCitySearches.length; i++) {
+      var cityName = document.createElement("button");
+      cityName.classList.add("previous-btn");
+      cityName.textContent = previousCitySearches[i];
+      previousSearchEL.append(cityName);
+    }
+  }
+  // var cityName = document.createElement("button");
+  // cityName.classList.add("previous-btn");
+  // cityName.textContent = previousCitySearches[0];
+  // previousSearchEL.prepend(cityName);
 }
 
 function getWeather(lat, lon, state) {
@@ -78,11 +97,11 @@ function getWeather(lat, lon, state) {
       return response.json();
     })
     .then(function (data) {
+      icon = data.weather[0].icon;
       temp = Math.round(data.main.temp);
       wind = Math.round(data.wind.speed);
       humidity = data.main.humidity;
       description = data.weather[0].description;
-
       getFuture(lat, lon);
       updateCurrentWeather(temp, wind, humidity);
     });
@@ -92,7 +111,8 @@ function updateCurrentWeather(temp, wind, humidity) {
   tempEl.textContent = `Temp: ${temp}°F`;
   windEl.textContent = `Wind: ${wind} MPH`;
   humidEl.textContent = `Humidity: ${humidity}%`;
-  descriptionEL.textContent = `Description: ${description}`;
+  iconImg = document.createElement("img");
+  iconImg.src = "https://openweathermap.org/img/wn/" + icon + "@2x.png";
 }
 
 function getFuture(lat, lon) {
