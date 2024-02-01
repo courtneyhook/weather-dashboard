@@ -1,4 +1,3 @@
-//variables
 var previousSearchEL = document.getElementById("previous-search");
 var fiveDayEl = document.getElementById("five-day");
 var currentCityEl = document.getElementById("current-city");
@@ -31,19 +30,18 @@ if (parsedCities) {
     previousSearchEL.append(cityName);
   }
 }
-//api
 
-//what will happen if there are two or more places with the same name in different states
-//what will happen if the city name is misspelled
-
-function getLocation(event) {
-  event.preventDefault();
-  currentCity = searchedCityEl.value;
+function getLocation(event, url = null, cityName = null) {
+  if (event) {
+    event.preventDefault();
+  }
+  currentCity = cityName ?? searchedCityEl.value;
   var urlGeo =
+    url ??
     "http://api.openweathermap.org/geo/1.0/direct?q=" +
-    currentCity +
-    "&appid=" +
-    apiKey;
+      currentCity +
+      "&appid=" +
+      apiKey;
   fetch(urlGeo)
     .then(function (response) {
       return response.json();
@@ -73,7 +71,13 @@ function updateCurrentCity() {
     previousCitySearches = JSON.parse(parsedCities);
     for (i = 0; i < previousCitySearches.length; i++) {
       var cityName = document.createElement("button");
+      var urlGeo =
+        "http://api.openweathermap.org/geo/1.0/direct?q=" +
+        previousCitySearches[i] +
+        "&appid=" +
+        apiKey;
       cityName.setAttribute("id", previousCitySearches[i]);
+      cityName.setAttribute("data-url", urlGeo);
       cityName.classList.add("previous-btn");
       cityName.textContent = previousCitySearches[i];
       previousSearchEL.append(cityName);
@@ -109,6 +113,7 @@ function updateCurrentWeather(temp, wind, humidity) {
   tempEl.textContent = `Temp: ${temp}°F`;
   windEl.textContent = `Wind: ${wind} MPH`;
   humidEl.textContent = `Humidity: ${humidity}%`;
+  currentIconEl.innerHTML = "";
   var pic = document.createElement("img");
   pic.setAttribute("src", `https://openweathermap.org/img/wn/${icon}@2x.png`);
   currentIconEl.append(pic);
@@ -140,6 +145,7 @@ function getFuture(lat, lon) {
         );
         var tomorrow = today.add(x, "day");
         tomorrow = tomorrow.format("M/D/YYYY");
+        document.getElementById(`day-${x}-icon`).innerHTML = "";
         document.getElementById(`day-${x}-icon`).append(futureIconSrc);
         document.getElementById(`day-${x}-date`).textContent = tomorrow;
         document.getElementById(
@@ -159,10 +165,8 @@ function getFuture(lat, lon) {
 
 function searchCityAgain(event) {
   event.stopPropagation();
-  var firedButton = previousSearchEL.children;
-  console.log(this.id);
-  for (var g = 0; g < firedButton.length; g++) {
-    console.log(firedButton[g].id);
+  if (event.target.matches("button")) {
+    getLocation(null, event.target.dataset.url, event.target.id);
   }
 }
 

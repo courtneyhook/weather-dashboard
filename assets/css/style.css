@@ -19,7 +19,7 @@ h3 {
 }
 
 .future {
-  background-color: white;
+  background-color: #55accf;
   width: 13%;
   display: inline-block;
   border: 1px solid black;
@@ -33,7 +33,7 @@ h3 {
 #current-search {
   font-size: 25px;
   line-height: 0.7;
-  background-color: white;
+  background-color: #55accf;
 }
 
 #current-city {
