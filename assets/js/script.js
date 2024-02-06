@@ -19,6 +19,7 @@ var currentTime = date.format("h:m:s A");
 var lon, lat, state, temp, wind, humidity, description, icon, iconImg, iconVar;
 var apiKey = "9f93286bb3109d48c225c107a2745543";
 
+//this block gets a list of previously searched cities from local storage and displays them when the page is opened
 var parsedCities = localStorage.getItem("cities");
 if (parsedCities) {
   previousCitySearches = JSON.parse(parsedCities);
@@ -31,6 +32,7 @@ if (parsedCities) {
   }
 }
 
+//this function gets a city name from the user and finds the latitude and longitude
 function getLocation(event, url = null, cityName = null) {
   if (event) {
     event.preventDefault();
@@ -55,6 +57,7 @@ function getLocation(event, url = null, cityName = null) {
     });
 }
 
+//this function appends the city name to the top of a list and adds it to local storage
 function updateCurrentCity() {
   currentCityEl.textContent = `${currentCity} (${currentDate})`;
   searchedCityEl.value = "";
@@ -72,7 +75,7 @@ function updateCurrentCity() {
     for (i = 0; i < previousCitySearches.length; i++) {
       var cityName = document.createElement("button");
       var urlGeo =
-        "http://api.openweathermap.org/geo/1.0/direct?q=" +
+        "api.openweathermap.org/geo/1.0/direct?q=" +
         previousCitySearches[i] +
         "&appid=" +
         apiKey;
@@ -85,6 +88,7 @@ function updateCurrentCity() {
   }
 }
 
+//this function returns the current weather for a city
 function getWeather(lat, lon, state) {
   var urlCurrentWeather =
     "https://api.openweathermap.org/data/2.5/weather?units=imperial&lat=" +
@@ -109,6 +113,7 @@ function getWeather(lat, lon, state) {
     });
 }
 
+//this function updates the DOM for the current weather
 function updateCurrentWeather(temp, wind, humidity) {
   tempEl.textContent = `Temp: ${temp}°F`;
   windEl.textContent = `Wind: ${wind} MPH`;
@@ -120,8 +125,8 @@ function updateCurrentWeather(temp, wind, humidity) {
   descriptionEL.textContent = description;
 }
 
+//this function finds and displays the future forecast for the next five days
 function getFuture(lat, lon) {
-  console.log("future");
   var urlFutureForecast =
     "https://api.openweathermap.org/data/2.5/forecast?units=imperial&cnt=5&lat=" +
     lat +
@@ -163,6 +168,7 @@ function getFuture(lat, lon) {
     });
 }
 
+//when the user clicks on a previously searched city, it will become the current city
 function searchCityAgain(event) {
   event.stopPropagation();
   if (event.target.matches("button")) {
