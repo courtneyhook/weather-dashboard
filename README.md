@@ -32,6 +32,7 @@ If I were to continue this project I would like to add the following features:
 - a way to handle misspelled names
 
 ![Screenshot of webpage](assets/images/weather-outlook-screenshot.png)
+[Deployed page](https://courtneyhook.github.io/weather-dashboard/)
 
 ## Credits
 
