@@ -40,7 +40,7 @@ function getLocation(event, url = null, cityName = null) {
   currentCity = cityName ?? searchedCityEl.value;
   var urlGeo =
     url ??
-    "//api.openweathermap.org/geo/1.0/direct?q=" +
+    "https://api.openweathermap.org/geo/1.0/direct?q=" +
       currentCity +
       "&appid=" +
       apiKey;
@@ -75,7 +75,7 @@ function updateCurrentCity() {
     for (i = 0; i < previousCitySearches.length; i++) {
       var cityName = document.createElement("button");
       var urlGeo =
-        "//api.openweathermap.org/geo/1.0/direct?q=" +
+        "https://api.openweathermap.org/geo/1.0/direct?q=" +
         previousCitySearches[i] +
         "&appid=" +
         apiKey;
@@ -91,7 +91,7 @@ function updateCurrentCity() {
 //this function returns the current weather for a city
 function getWeather(lat, lon, state) {
   var urlCurrentWeather =
-    "//api.openweathermap.org/data/2.5/weather?units=imperial&lat=" +
+    "https://api.openweathermap.org/data/2.5/weather?units=imperial&lat=" +
     lat +
     "&lon=" +
     lon +
@@ -128,7 +128,7 @@ function updateCurrentWeather(temp, wind, humidity) {
 //this function finds and displays the future forecast for the next five days
 function getFuture(lat, lon) {
   var urlFutureForecast =
-    "//api.openweathermap.org/data/2.5/forecast?units=imperial&cnt=5&lat=" +
+    "https://api.openweathermap.org/data/2.5/forecast?units=imperial&cnt=5&lat=" +
     lat +
     "&lon=" +
     lon +
