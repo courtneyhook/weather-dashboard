@@ -38,7 +38,7 @@ function getLocation(event, url = null, cityName = null) {
   currentCity = cityName ?? searchedCityEl.value;
   var urlGeo =
     url ??
-    "http://api.openweathermap.org/geo/1.0/direct?q=" +
+    "//api.openweathermap.org/geo/1.0/direct?q=" +
       currentCity +
       "&appid=" +
       apiKey;
